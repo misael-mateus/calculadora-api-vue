@@ -1,35 +1,28 @@
 <template>
   <div class="calculator">
-    <Display :value="displayValue" />
+    <Display :value="displayValue"/>
 
-    <Button label="AC" @onClick="clearMemory" operation />
-    <Button label="Del" @onClick="addDigit" operation />
-    <Button label="%" @onClick="setOperation" operation />
-    <Button label="/" @onClick="setOperation" operation />
-    <Button label="7" @onClick="addDigit" />
-    <Button label="9" @onClick="addDigit" />
-    <Button label="8" @onClick="addDigit" />
-    <Button label="*" @onClick="setOperation" operation />
-    <Button label="4" @onClick="addDigit" />
-    <Button label="5" @onClick="addDigit" />
-    <Button label="6" @onClick="addDigit" />
-    <Button label="-" @onClick="setOperation" operation />
-    <Button label="1" @onClick="addDigit" />
-    <Button label="2" @onClick="addDigit" />
-    <Button label="3" @onClick="addDigit" />
-    <Button label="+" @onClick="setOperation" operation />
-    <Button label="0" @onClick="addDigit" />
-    <Button label="+/-" @onClick="addDigit" />
-    <Button label="." @onClick="addDigit" />
-    <Button label="√" @onClick="setOperation" operation />
-
-    <Button
-      style="background: #eb50bc"
-      class="sinalIgual"
-      label="="
-      @onClick="setOperation"
-      operation
-    />
+    <Button label="AC" @onClick="clearMemory" operation/>
+    <Button label="Del" @onClick="addDigit" operation/>
+    <Button label="%" @onClick="setOperation" operation/>
+    <Button label="/" @onClick="setOperation" operation/>
+    <Button label="7" @onClick="addDigit"/>
+    <Button label="9" @onClick="addDigit"/>
+    <Button label="8" @onClick="addDigit"/>
+    <Button label="*" @onClick="setOperation" operation/>
+    <Button label="4" @onClick="addDigit"/>
+    <Button label="5" @onClick="addDigit"/>
+    <Button label="6" @onClick="addDigit"/>
+    <Button label="-" @onClick="setOperation" operation/>
+    <Button label="1" @onClick="addDigit"/>
+    <Button label="2" @onClick="addDigit"/>
+    <Button label="3" @onClick="addDigit"/>
+    <Button label="+" @onClick="setOperation" operation/>
+    <Button label="0" @onClick="addDigit"/>
+    <Button label="+/-" @onClick="addDigit"/>
+    <Button label="." @onClick="addDigit"/>
+    <Button label="√" @onClick="setOperation" operation/>
+    <Button class="sinalIgual" label="=" @onClick="setOperation" operation/>
   </div>
 </template>
 
@@ -37,54 +30,63 @@
 import Display from "../components/DisplayCalcular";
 import Button from "../components/ButtonCalcular";
 import axios from "axios";
+
 export default {
   data: function () {
     return {
       displayValue: "0",
       clearDisplay: false,
       operation: null,
-      values: [0, 0],
+      values: [],
       totalGeral: 0,
+      url: "http://localhost:3000",
     };
   },
 
-  components: { Button, Display },
+  components: {Button, Display},
   methods: {
     clearMemory() {
       Object.assign(this.$data, this.$options.data());
     },
     setOperation(operation) {
-      var elementos = [this.totalGeral, this.displayValue];
-      var resultado;
-      var url = "http://localhost:3000";
+      //    var elementos = [this.totalGeral, this.displayValue];
+      var resultado = 0;
       switch (operation) {
         case "+":
-          url += "/somar";
+          this.url += "/somar";
+          console.log(this.url)
           break;
         case "-":
-          url -= "/subtrair";
+          this.url += "/subtrair";
+          console.log(this.url)
           break;
         case "/":
-          url /= "/dividir";
+          this.url += "/dividir";
           break;
         case "*":
-          url *= "/multiplicacao";
+          this.url += "/multiplicacao";
           break;
         case "%":
-          url %= "/porcentagem";
+          this.url += "/porcentagem";
           break;
         case "=":
-          axios.post(url, elementos).then(function (retorno) {
-            resultado = retorno;
-          });
+          var elementos = `{"elementos":[${this.totalGeral},${this.displayValue}]}`;
+
+          axios.post(this.url, elementos)
+              .then(function (response) {
+                if (response.status === 200) {
+                  resultado = response.data;
+                }
+              })
           this.displayValue = resultado;
           this.totalGeral = resultado;
-          console.log(operation);
           break;
       }
+
     },
     addDigit(n) {
-      console.log(n);
+      this.displayValue = n;
+
     },
   },
 };
